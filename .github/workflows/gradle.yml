@@ -1,0 +1,28 @@
+name: Java CI with Gradle
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+        # Запускаем SUT
+        # & означает, что в фоновом режиме не блокируем терминал для запуска тестов(должен быть обязательно)
+
+      - name: Start SUT 9
+        run: java -jar ./artifacts/app-ibank-build-for-testers.jar -port=8086 &
+      - name: Build with Gradle
+        run: ./gradlew test --info -Dselenide.headless=true
+
+# Команда `chmod +x gradlew` делает файл gradlew исполняемым в linux. 
+# Команда `./gradlew test` собирает ваш проект и запускает тесты.
