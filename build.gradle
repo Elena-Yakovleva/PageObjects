@@ -1,0 +1,56 @@
+plugins {
+    id 'java'
+}
+
+group = 'unit-project'
+version = '1.0-SNAPSHOT'
+
+sourceCompatibility = 17
+compileJava.options.encoding = 'UTF-8'
+compileTestJava.options.encoding = 'UTF-8'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.6.1'
+
+    testImplementation 'com.github.javafaker:javafaker:1.0.2'
+
+    testImplementation 'junit:junit:4.13'
+    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.6.2'
+
+
+    compileOnly 'org.projectlombok:lombok:1.18.36'
+    annotationProcessor 'org.projectlombok:lombok:1.18.36'
+
+    testCompileOnly 'org.projectlombok:lombok:1.18.36'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.36'
+
+    testImplementation 'io.rest-assured:rest-assured:5.3.1'
+    testImplementation 'io.rest-assured:json-schema-validator:5.1.1'
+    testImplementation 'com.google.code.gson:gson:2.8.6'
+
+    testImplementation 'org.seleniumhq.selenium:selenium-java:4.18.1'
+    testImplementation 'io.github.bonigarcia:webdrivermanager:5.9.0'
+
+    testImplementation 'com.codeborne:selenide:7.5.1'
+    implementation 'io.netty:netty-all:4.1.118.Final'
+
+}
+
+test {
+    useJUnitPlatform()
+
+    // в тестах, вызывая `gradlew test -Dselenide.headless=true` будем передавать этот параметр в JVM (где его подтянет Selenide)
+    // свойство selenide.headless используется в проектах на основе Selenide для передачи значения параметра в JVM
+    systemProperty 'selenide.headless', System.getProperty('selenide.headless')
+
+    // свойство chromeoptions.prefs используется для задания настроек браузера в проектах на основе Selenide, выключаем менеджер паролей
+    systemProperty 'chromeoptions.prefs', System.getProperty('chromeoptions.prefs', "profile.password_manager_leak_detection=false")
+
+}
