@@ -1,32 +1,119 @@
 package ru.netology.test;
 
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.netology.data.DataHelper;
+import ru.netology.page.DashboardPage;
 import ru.netology.page.LoginPage;
 
 import static com.codeborne.selenide.Selenide.open;
+import static io.restassured.RestAssured.given;
 import static ru.netology.data.DataHelper.*;
 
 public class MoneyTransferTest {
 
     // java -jar .\artifacts\app-ibank-build-for-testers.jar
+    DashboardPage dashboardPage;
+    UserСard userFirstCardInfo;
+    UserСard userSecondCardInfo;
+    int firstCardBalance;
+    int secondCardBalance;
+
+    @BeforeAll
+    public static void setup() {
+        given()
+                .baseUri("http://localhost:9999")
+                .contentType("text/html; charset=UTF-8")
+                .when()
+                .get("/")
+                .then()
+                .statusCode(200);
+    }
+
+    @BeforeEach
+    void setupAll() {
+        open("http://localhost:9999");
+        var user = getAuthInfo();
+        var code = getVerificationCodeFor(user);
+        var loginPage = new LoginPage();
+        var verificationPage = loginPage.validLogin(user);
+        dashboardPage = verificationPage.validVerify(code);
+        userFirstCardInfo = DataHelper.getFirstCard(user);
+        firstCardBalance = dashboardPage.getCardBalance(userFirstCardInfo);
+        userSecondCardInfo = DataHelper.getSecondCard(user);
+        secondCardBalance= dashboardPage.getCardBalance(userSecondCardInfo);
+
+    }
+
 
     @Test
     void shouldTransferMoneyFromSecondCardToFirstCard() {
-        var user = getAuthInfo();
-        var code = getVerificationCodeFor(user);
-        open("http://localhost:9999");
-        var loginPage = new LoginPage();
-        var verifiloginPage = loginPage.validLogin(user);
-        var dashboardPage = verifiloginPage.validVerify(code);
-        var transferPage = dashboardPage.selectToFirstСard();
-        var sumTransfer = "200";
-        var secondCard = getSecondCard(user);
-        dashboardPage = transferPage.moneyTransfer(sumTransfer, secondCard);
+        var amount = generateValidAmount(secondCardBalance);
+        var expectedBalanceFirstCard = firstCardBalance + amount;
+        var expectedBalanceSecondCard = secondCardBalance - amount;
+        var transferPage = dashboardPage.selectCard(userFirstCardInfo);
+        dashboardPage = transferPage.moneyValidTransfer(String.valueOf(amount), userSecondCardInfo);
+        dashboardPage.reloadDashboardPage();
 
+    }
+
+    @Test
+    void shouldTransferMoneyFromFirstCardToSecondCard() {
+        var amount = generateValidAmount(firstCardBalance);
+        var expectedBalanceFirstCard = firstCardBalance - amount;
+        var expectedBalanceSecondCard = secondCardBalance + amount;
+        var transferPage = dashboardPage.selectCard(userSecondCardInfo);
+        dashboardPage = transferPage.moneyValidTransfer(String.valueOf(amount), userFirstCardInfo);
+        dashboardPage.reloadDashboardPage();
+
+    }
+
+    @Test
+    void shouldCancelTransferMoneyFromSecondCardToFirstCard() {
+        var amount = generateValidAmount(secondCardBalance);
+        var expectedBalanceFirstCard = firstCardBalance + amount;
+        var expectedBalanceSecondCard = secondCardBalance - amount;
+        var transferPage = dashboardPage.selectCard(userFirstCardInfo);
+        dashboardPage=transferPage.cancelTransfer();
+    }
+
+    @Test
+    void shouldCancelTransferMoneyFromFirstCardToSecondCard() {
+        var amount = generateValidAmount(firstCardBalance);
+        var expectedBalanceFirstCard = firstCardBalance - amount;
+        var expectedBalanceSecondCard = secondCardBalance + amount;
+        var transferPage = dashboardPage.selectCard(userSecondCardInfo);
+        dashboardPage = transferPage.cancelTransfer();
+    }
+
+
+
+
+    @Test
+    void shouldNotTransferInvalidAmountFromSecondCardToFirstCard(){
+        var amount = generateInvalidAmount(secondCardBalance);
+        var expectedBalanceFirstCard = firstCardBalance + amount;
+        var expectedBalanceSecondCard = secondCardBalance - amount;
+        var transferPage = dashboardPage.selectCard(userFirstCardInfo);
+        transferPage.moneyTransfer(String.valueOf(amount), userSecondCardInfo);
+        transferPage.findErrorMessage("Ошибка");
 
 
     }
+
+    @Test
+    void shouldNotTransferInvalidAmountFromFirstCardToSecondCard() {
+        var amount = generateInvalidAmount(firstCardBalance);
+        var expectedBalanceFirstCard = firstCardBalance - amount;
+        var expectedBalanceSecondCard = secondCardBalance + amount;
+        var transferPage = dashboardPage.selectCard(userSecondCardInfo);
+        transferPage.moneyTransfer(String.valueOf(amount), userFirstCardInfo);
+        transferPage.findErrorMessage("Ошибка");
+
+    }
+
+
 
 
 }
