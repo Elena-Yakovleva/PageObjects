@@ -9,6 +9,7 @@ import ru.netology.page.LoginPage;
 
 import static com.codeborne.selenide.Selenide.open;
 import static io.restassured.RestAssured.given;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static ru.netology.data.DataHelper.*;
 
 public class MoneyTransferTest {
@@ -55,6 +56,8 @@ public class MoneyTransferTest {
         var transferPage = dashboardPage.selectCard(userFirstCardInfo);
         dashboardPage = transferPage.moneyValidTransfer(String.valueOf(amount), userSecondCardInfo);
         dashboardPage.reloadDashboardPage();
+        assertAll(() -> dashboardPage.checkCardBalance(userFirstCardInfo, expectedBalanceFirstCard),
+                () -> dashboardPage.checkCardBalance(userSecondCardInfo, expectedBalanceSecondCard));
 
     }
 
@@ -66,25 +69,31 @@ public class MoneyTransferTest {
         var transferPage = dashboardPage.selectCard(userSecondCardInfo);
         dashboardPage = transferPage.moneyValidTransfer(String.valueOf(amount), userFirstCardInfo);
         dashboardPage.reloadDashboardPage();
+        assertAll(() -> dashboardPage.checkCardBalance(userFirstCardInfo, expectedBalanceFirstCard),
+                () -> dashboardPage.checkCardBalance(userSecondCardInfo, expectedBalanceSecondCard));
 
     }
 
     @Test
     void shouldCancelTransferMoneyFromSecondCardToFirstCard() {
         var amount = generateValidAmount(secondCardBalance);
-        var expectedBalanceFirstCard = firstCardBalance + amount;
-        var expectedBalanceSecondCard = secondCardBalance - amount;
+        var expectedBalanceFirstCard = firstCardBalance;
+        var expectedBalanceSecondCard = secondCardBalance;
         var transferPage = dashboardPage.selectCard(userFirstCardInfo);
         dashboardPage=transferPage.cancelTransfer();
+        assertAll(() -> dashboardPage.checkCardBalance(userFirstCardInfo, expectedBalanceFirstCard),
+                () -> dashboardPage.checkCardBalance(userSecondCardInfo, expectedBalanceSecondCard));
     }
 
     @Test
     void shouldCancelTransferMoneyFromFirstCardToSecondCard() {
         var amount = generateValidAmount(firstCardBalance);
-        var expectedBalanceFirstCard = firstCardBalance - amount;
-        var expectedBalanceSecondCard = secondCardBalance + amount;
+        var expectedBalanceFirstCard = firstCardBalance;
+        var expectedBalanceSecondCard = secondCardBalance;
         var transferPage = dashboardPage.selectCard(userSecondCardInfo);
         dashboardPage = transferPage.cancelTransfer();
+        assertAll(() -> dashboardPage.checkCardBalance(userFirstCardInfo, expectedBalanceFirstCard),
+                () -> dashboardPage.checkCardBalance(userSecondCardInfo, expectedBalanceSecondCard));
     }
 
 
@@ -93,8 +102,6 @@ public class MoneyTransferTest {
     @Test
     void shouldNotTransferInvalidAmountFromSecondCardToFirstCard(){
         var amount = generateInvalidAmount(secondCardBalance);
-        var expectedBalanceFirstCard = firstCardBalance + amount;
-        var expectedBalanceSecondCard = secondCardBalance - amount;
         var transferPage = dashboardPage.selectCard(userFirstCardInfo);
         transferPage.moneyTransfer(String.valueOf(amount), userSecondCardInfo);
         transferPage.findErrorMessage("Ошибка");
@@ -105,8 +112,6 @@ public class MoneyTransferTest {
     @Test
     void shouldNotTransferInvalidAmountFromFirstCardToSecondCard() {
         var amount = generateInvalidAmount(firstCardBalance);
-        var expectedBalanceFirstCard = firstCardBalance - amount;
-        var expectedBalanceSecondCard = secondCardBalance + amount;
         var transferPage = dashboardPage.selectCard(userSecondCardInfo);
         transferPage.moneyTransfer(String.valueOf(amount), userFirstCardInfo);
         transferPage.findErrorMessage("Ошибка");
