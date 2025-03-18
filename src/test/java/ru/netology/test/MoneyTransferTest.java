@@ -1,5 +1,6 @@
 package ru.netology.test;
 
+import org.junit.Assert;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,6 +21,7 @@ public class MoneyTransferTest {
     UserСard userSecondCardInfo;
     int firstCardBalance;
     int secondCardBalance;
+
 
     @BeforeAll
     public static void setup() {
@@ -102,9 +104,14 @@ public class MoneyTransferTest {
     @Test
     void shouldNotTransferInvalidAmountFromSecondCardToFirstCard(){
         var amount = generateInvalidAmount(secondCardBalance);
+        var expectedBalanceFirstCard = firstCardBalance;
+        var expectedBalanceSecondCard = secondCardBalance;
         var transferPage = dashboardPage.selectCard(userFirstCardInfo);
         transferPage.moneyTransfer(String.valueOf(amount), userSecondCardInfo);
-        transferPage.findErrorMessage("Ошибка");
+        assertAll(() ->transferPage.findErrorMessage("Ошибка"),
+                () -> dashboardPage.reloadDashboardPage(),
+                () -> dashboardPage.checkCardBalance(userFirstCardInfo, expectedBalanceFirstCard),
+                () -> dashboardPage.checkCardBalance(userSecondCardInfo, expectedBalanceSecondCard));
 
 
     }
@@ -112,9 +119,14 @@ public class MoneyTransferTest {
     @Test
     void shouldNotTransferInvalidAmountFromFirstCardToSecondCard() {
         var amount = generateInvalidAmount(firstCardBalance);
+        var expectedBalanceFirstCard = firstCardBalance;
+        var expectedBalanceSecondCard = secondCardBalance;
         var transferPage = dashboardPage.selectCard(userSecondCardInfo);
         transferPage.moneyTransfer(String.valueOf(amount), userFirstCardInfo);
-        transferPage.findErrorMessage("Ошибка");
+        assertAll(() ->transferPage.findErrorMessage("Ошибка"),
+                () -> dashboardPage.reloadDashboardPage(),
+                () -> dashboardPage.checkCardBalance(userFirstCardInfo, expectedBalanceFirstCard),
+                () -> dashboardPage.checkCardBalance(userSecondCardInfo, expectedBalanceSecondCard));
 
     }
 
