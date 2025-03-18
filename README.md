@@ -1,4 +1,4 @@
-
+[![Java CI with Gradle](https://github.com/Elena-Yakovleva/PageObjects/actions/workflows/gradle.yml/badge.svg)](https://github.com/Elena-Yakovleva/PageObjects/actions/workflows/gradle.yml)
 
 ### Задача №1: Page Object's
 Вам необходимо добить тестирование функции перевода с карты на карту. Разработчики пока реализовали возможность перевода только между своими картами, но уже хотят, чтобы вы всё протестировали.
