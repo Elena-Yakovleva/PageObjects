@@ -56,6 +56,14 @@ public class DataHelper {
         return new Random().nextInt(balance) + balance;
     }
 
+    public static double rublesToKopecks(double balance) {
+        return  balance * 100;
+    }
+
+    public static int kopecksToRubles(double balance) {
+        return  (int) balance / 100;
+    }
+
 
 
 

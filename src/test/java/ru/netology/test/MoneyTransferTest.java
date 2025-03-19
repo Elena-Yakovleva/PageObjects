@@ -11,6 +11,7 @@ import ru.netology.page.LoginPage;
 import static com.codeborne.selenide.Selenide.open;
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static ru.netology.data.DataHelper.*;
 
 public class MoneyTransferTest {
@@ -48,7 +49,12 @@ public class MoneyTransferTest {
         secondCardBalance= dashboardPage.getCardBalance(userSecondCardInfo);
 
     }
-
+    @Test
+    void shouldNotHandleEmptyForm() {
+        var transferPage = dashboardPage.selectCard(userFirstCardInfo);
+        transferPage.transferButtonClick();
+        transferPage.findErrorMessage("Ошибка! ");
+    }
 
     @Test
     void shouldTransferMoneyFromSecondCardToFirstCard() {
@@ -60,7 +66,6 @@ public class MoneyTransferTest {
         dashboardPage.reloadDashboardPage();
         assertAll(() -> dashboardPage.checkCardBalance(userFirstCardInfo, expectedBalanceFirstCard),
                 () -> dashboardPage.checkCardBalance(userSecondCardInfo, expectedBalanceSecondCard));
-
     }
 
     @Test
@@ -73,7 +78,6 @@ public class MoneyTransferTest {
         dashboardPage.reloadDashboardPage();
         assertAll(() -> dashboardPage.checkCardBalance(userFirstCardInfo, expectedBalanceFirstCard),
                 () -> dashboardPage.checkCardBalance(userSecondCardInfo, expectedBalanceSecondCard));
-
     }
 
     @Test
@@ -112,8 +116,6 @@ public class MoneyTransferTest {
                 () -> dashboardPage.reloadDashboardPage(),
                 () -> dashboardPage.checkCardBalance(userFirstCardInfo, expectedBalanceFirstCard),
                 () -> dashboardPage.checkCardBalance(userSecondCardInfo, expectedBalanceSecondCard));
-
-
     }
 
     @Test
@@ -127,7 +129,6 @@ public class MoneyTransferTest {
                 () -> dashboardPage.reloadDashboardPage(),
                 () -> dashboardPage.checkCardBalance(userFirstCardInfo, expectedBalanceFirstCard),
                 () -> dashboardPage.checkCardBalance(userSecondCardInfo, expectedBalanceSecondCard));
-
     }
 
 

@@ -42,6 +42,12 @@ public class TransferPage {
         return new DashboardPage();
     }
 
+    // метод нажатия на кнопку
+    public TransferPage transferButtonClick() {
+        transferButton.click();
+        return new TransferPage();
+    }
+
 
     //  метод проверки наличия сообщения об ошибке
     public void findErrorMessage(String expectedText) {
