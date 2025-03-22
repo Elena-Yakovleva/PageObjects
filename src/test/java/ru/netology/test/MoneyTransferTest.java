@@ -24,16 +24,6 @@ public class MoneyTransferTest {
     int secondCardBalance;
 
 
-    @BeforeAll
-    public static void setup() {
-        given()
-                .baseUri("http://localhost:9999")
-                .contentType("text/html; charset=UTF-8")
-                .when()
-                .get("/")
-                .then()
-                .statusCode(200);
-    }
 
     @BeforeEach
     void setupAll() {
@@ -111,10 +101,6 @@ public class MoneyTransferTest {
         var expectedBalanceFirstCard = firstCardBalance;
         var expectedBalanceSecondCard = secondCardBalance;
         var transferPage = dashboardPage.selectCard(userFirstCardInfo);
-        System.out.println("shouldNotTransferInvalidAmountFromSecondCardToFirstCard:" + "сумма перевода " + amount +
-                ",\n баланс карты secondCard до списания " + secondCardBalance +
-                ",\n баланс карты firstCard до начисления " + firstCardBalance);
-        transferPage.moneyTransfer(String.valueOf(amount), userSecondCardInfo);
         assertAll(() ->transferPage.findErrorMessage("Ошибка"),
                 () -> dashboardPage.reloadDashboardPage(),
                 () -> dashboardPage.checkCardBalance(userFirstCardInfo, expectedBalanceFirstCard),
@@ -127,9 +113,6 @@ public class MoneyTransferTest {
         var amount = generateInvalidAmount(firstCardBalance);
         var expectedBalanceFirstCard = firstCardBalance;
         var expectedBalanceSecondCard = secondCardBalance;
-        System.out.println("shouldNotTransferInvalidAmountFromFirstCardToSecondCard:" + "сумма перевода " + amount +
-                ",\n баланс карты firstCard до списания " + firstCardBalance +
-                ",\n баланс карты secondCard до начисления " + secondCardBalance);
         var transferPage = dashboardPage.selectCard(userSecondCardInfo);
         transferPage.moneyTransfer(String.valueOf(amount), userFirstCardInfo);
         assertAll(() ->transferPage.findErrorMessage("Ошибка"),

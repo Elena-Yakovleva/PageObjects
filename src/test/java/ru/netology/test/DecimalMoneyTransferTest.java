@@ -25,19 +25,6 @@ public class DecimalMoneyTransferTest {
     double secondCardBalance;
 
 
-
-
-    @BeforeAll
-    public static void setup() {
-        given()
-                .baseUri("http://localhost:9999")
-                .contentType("text/html; charset=UTF-8")
-                .when()
-                .get("/")
-                .then()
-                .statusCode(200);
-    }
-
     @BeforeEach
     void setupAll() {
         open("http://localhost:9999");
@@ -63,10 +50,6 @@ public class DecimalMoneyTransferTest {
         var expectedBalanceFirstCard = rublesToKopecks(firstCardBalance) + amountDecimalSum;
         var expectedBalanceSecondCard = rublesToKopecks(secondCardBalance) - amountDecimalSum;
         var transferPage = dashboardPage.selectCard(userFirstCardInfo);
-        System.out.println("сумма перевода " + amount +
-                ",\nсумма в копейках " + amountDecimalSum +
-                ",\n баланс карты firstCard до начисления " + firstCardBalance +
-                ",\n баланс карты secondCard до списания " + secondCardBalance);
         dashboardPage = transferPage.moneyValidTransfer(String.valueOf(amount), userSecondCardInfo);
         dashboardPage.reloadDashboardPage();
 
